@@ -11,21 +11,19 @@ retrofit2 极简封装，极简接入。
 
 
  范例请求URL
- http://wanandroid.com/article/list/0/json"
+ 
+    http://47.94.110.156:9000/member/add
  
  对应json
- {
-    "data":{
-        "curPage":1,
-        "offset":0,
-        "over":false,
-        "pageCount":288,
-        "size":20,
-        "total":5757
-    },
-    "errorCode":0,
-    "errorMsg":""
-}
+ 
+    {
+    "code":0,
+    "msg":"SUCCESS",
+    "data":{"ORG_ID":"11111"},
+    "head":{"token":"token","appFlag":"BC"},
+    "responseDate":"2019-02-10",
+    "responseTime":"2019-02-10 21:45:10"
+    }
 
 
 
@@ -35,7 +33,7 @@ retrofit2 极简封装，极简接入。
 
      加依赖项
  
-     implementation 'com.dvlp:dvlpokhttp:1.0.1'
+      module 引用方式
      
     添加网路权限
  
@@ -43,33 +41,46 @@ retrofit2 极简封装，极简接入。
 
     在Aplication进行初始化
 
-    public static final String API_BASE = "http://wanandroid.com/";//正常在项目常量类 Api.class
-
-    RetrofitManager.init(API_BASE);
+     //替换比财 json解析格式
+     RetrofitManager.initJSonTag("code","msg","data","0");
+     //初始化
+     RetrofitManager.init(Api.API_BASE);
+     
+     //。。。日志初始化请看源码
     
 2.定义请求接口 ApiService
     
-      //获取首页文章列表
-    @GET("article/list/0/json")
-    Call2<Article> getArticle0(); //Article：与data数据对应的实体类
+    //比财测试
+    @POST(Api.GET_BICAI)
+    Call2<String> getBicai(@Body Map<String, String> map);
     
  3.发起请求 
    
-    RetrofitManager.create(ApiService.class)
-                .getArticle0()
-                .enqueue(hashCode(), new CallbackAnim<Article>(this) {
+        public void articleBc(View view) {
+
+        //构建参数
+        Map<String, String> paramMap = new HashMap();
+        paramMap.put("ORG_ID", "11111");
+
+
+        RetrofitManager.create(ApiService.class)
+                .getBicai(paramMap)
+                .enqueue(hashCode(), new Callback2<String>() {
                     @Override
-                    public void onError(Call2<Article> call2, HttpError error) {
+                    public void onError(Call2<String> call2, HttpError error) {
                         Toast.makeText(MainActivity.this, error.msg, Toast.LENGTH_SHORT).show();
 
                     }
 
                     @Override
-                    public void onSuccess(Call2<Article> call2, Article article) {
-                        Toast.makeText(MainActivity.this, "获取首页文章列表", Toast.LENGTH_SHORT).show();
+                    public void onSuccess(Call2<String> call2, String response) {
+                        Toast.makeText(MainActivity.this, "请求成功", Toast.LENGTH_SHORT).show();
 
                     }
                 });
+    }
+
+
       
 ------------------------------------------------end-------------------------------------------------------------------------------
 
